@@ -21,3 +21,15 @@
 ** Check migration installed **
 
     migration -version
+
+## Sqlc : [sqlc.dev](https://sqlc.dev/)
+[postgresql sqlc documents](https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html)
+
+[github](https://github.com/sqlc-dev/sqlc)
+
+install on ubuntu : ```sudo snap install sqlc```
+
+commands : ```sqlc help```
+
+sqlc configuration : https://docs.sqlc.dev/en/latest/reference/config.html#version-2
+
