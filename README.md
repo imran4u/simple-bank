@@ -1,6 +1,6 @@
 # simple-bank
 
-## steps to download mirgation on ubuntu
+## steps to download mirgation on ubuntu ( [github-ref](https://github.com/golang-migrate/migrate))
     
 **Add the GPG key for the repository:**
 
