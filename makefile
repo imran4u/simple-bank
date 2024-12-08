@@ -25,6 +25,7 @@ migrate_up:
 migrate_down:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down
 
+# To generate sqlc go code from sqlc query ./db/query/ *.sql
 sqlc_gen:
 	sqlc generate
 
