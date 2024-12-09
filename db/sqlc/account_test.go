@@ -33,3 +33,19 @@ func TestCreateAccount(t *testing.T) {
 	createRandomAccount(t)
 
 }
+
+func TestGetAccount(t *testing.T) {
+	account := createRandomAccount(t)
+	account2, err := testQueries.GetAccount(context.Background(), account.ID)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, account2)
+
+	require.Equal(t, account.ID, account2.ID)
+	require.Equal(t, account.Owner, account2.Owner)
+	require.Equal(t, account.Currency, account2.Currency)
+	require.Equal(t, account.Balance, account2.Balance)
+
+	require.Equal(t, account.CreatedAt, account2.CreatedAt)
+
+}
