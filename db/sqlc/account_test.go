@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/imran4u/simple-bank/util"
 	"github.com/stretchr/testify/require"
@@ -47,5 +48,6 @@ func TestGetAccount(t *testing.T) {
 	require.Equal(t, account.Balance, account2.Balance)
 
 	require.Equal(t, account.CreatedAt, account2.CreatedAt)
+	require.WithinDuration(t, account.CreatedAt, account2.CreatedAt, time.Second)
 
 }
