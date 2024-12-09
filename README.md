@@ -33,3 +33,9 @@ commands : ```sqlc help```
 
 sqlc configuration : https://docs.sqlc.dev/en/latest/reference/config.html#version-2
 
+## Lib PQ driver for postgres go driver
+https://github.com/lib/pq
+
+
+## To check test result use Testify package
+https://github.com/stretchr/testify
