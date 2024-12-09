@@ -31,7 +31,8 @@ sqlc_gen:
 
 # command for unit test ./... ( to run in multiple packages)
 # ... : This is a Go-specific wildcard that means all subdirectories recursively
+# -count=1 : to disable go test cache.
 test:
-	go test -v -cover ./...
+	go test -v -cover -count=1 ./...
 
 .PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test
