@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -71,5 +72,19 @@ func TestUpdateAccount(t *testing.T) {
 
 	require.Equal(t, account.CreatedAt, account2.CreatedAt)
 	require.WithinDuration(t, account.CreatedAt, account2.CreatedAt, time.Second)
+
+}
+
+func TestDeleteAccount(t *testing.T) {
+	account := createRandomAccount(t)
+
+	err := testQueries.DeleteAccount(context.Background(), account.ID)
+	require.NoError(t, err)
+
+	account2, err := testQueries.GetAccount(context.Background(), account.ID)
+
+	require.Error(t, err)
+	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.Empty(t, account2)
 
 }
