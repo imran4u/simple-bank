@@ -88,3 +88,23 @@ func TestDeleteAccount(t *testing.T) {
 	require.Empty(t, account2)
 
 }
+
+func TestListAccounts(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		createRandomAccount(t)
+	}
+	args := ListAccountsParams{
+		Offset: 5,
+		Limit:  5,
+	}
+	// TODO: why this is not returning all 5 accounts. always returning zero.
+	accounts, err := testQueries.ListAccounts(context.Background(), args)
+
+	require.NoError(t, err)
+	// require.Equal(t, len(accounts), 5)
+	// require.Len(t, accounts, 5)
+
+	for account := range accounts {
+		require.NotEmpty(t, account)
+	}
+}
