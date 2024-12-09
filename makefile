@@ -29,4 +29,9 @@ migrate_down:
 sqlc_gen:
 	sqlc generate
 
-.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen
+# command for unit test ./... ( to run in multiple packages)
+# ... : This is a Go-specific wildcard that means all subdirectories recursively
+test:
+	go test -v -cover ./...
+
+.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test
