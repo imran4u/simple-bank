@@ -6,6 +6,10 @@ DB_URL=postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable
 postgres:
 	sudo docker run --name postgres17 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:17.2-alpine3.20
 
+#Restrat if container is there
+postgres-start:
+	sudo docker start postgres17 
+
 #Create dabase simaple_bank in running container anem postgres17
 createdb: 
 	sudo docker exec -it postgres17 createdb --username=root --owner=root simple_bank
@@ -35,4 +39,4 @@ sqlc_gen:
 test:
 	go test -v -cover -count=1 ./...
 
-.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test
+.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test postgres-start
