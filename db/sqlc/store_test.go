@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,9 +15,11 @@ func TestTransaction(t *testing.T) {
 	account2 := createRandomAccount(t)
 	amount := int64(10)
 
+	fmt.Println("... Befor tx", account1.Balance, account2.Balance)
+
 	// run n concurency transfer tx
-	//FIXME: why n=5?
-	n := 1
+	//FIXME: why n=5? :Ans-> just to test concurency on tabel
+	n := 5
 
 	// Notify can't work on other go routine, so use main gorountine with channel
 
@@ -79,7 +82,33 @@ func TestTransaction(t *testing.T) {
 		_, err = store.GetEntry(context.Background(), toEntry.ID)
 		require.NoError(t, err)
 
-		//TODO: check account balance
+		// check account
+
+		fromAccount := result.FromAccount
+		require.NotEmpty(t, fromAccount)
+		require.Equal(t, fromAccount.ID, account1.ID)
+
+		toAccount := result.ToAccount
+		require.NotEmpty(t, toAccount)
+		require.Equal(t, toAccount.ID, account2.ID)
+		fmt.Println("... on tx", fromAccount.Balance, toAccount.Balance)
+		// Balance
+		diff1 := account1.Balance - fromAccount.Balance
+		diff2 := toAccount.Balance - account2.Balance
+		require.Equal(t, diff1, diff2)
+		require.True(t, diff1 > 0)
+		require.True(t, diff1%amount == 0)
+
 	}
+
+	// Check final update balance:
+	updateAccount1, err := store.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+	require.Equal(t, account1.Balance-int64(n)*amount, updateAccount1.Balance)
+
+	updateAccount2, err := store.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+	require.Equal(t, account2.Balance+int64(n)*amount, updateAccount2.Balance)
+	fmt.Println("... After all tx", account1.Balance, account2.Balance)
 
 }
