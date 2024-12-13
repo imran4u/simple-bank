@@ -43,5 +43,9 @@ https://github.com/stretchr/testify
 
 ## Gin-framwork 
     Routing and middleware
-Document : https://gin-gonic.com/docs/examples/binding-and-validation/
-Repo : https://github.com/gin-gonic/gin
+- Document : https://gin-gonic.com/docs/examples/binding-and-validation/
+- Repo : https://github.com/gin-gonic/gin
+
+## Viper
+-   configuration management library in Go that allows developers to manage application settings and configuration files more effectively. 
+- [Resource repository](https://github.com/spf13/viper)
