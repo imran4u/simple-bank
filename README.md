@@ -39,3 +39,9 @@ https://github.com/lib/pq
 
 ## To check test result use Testify package
 https://github.com/stretchr/testify
+
+
+## Gin-framwork 
+    Routing and middleware
+Document : https://gin-gonic.com/docs/examples/binding-and-validation/
+Repo : https://github.com/gin-gonic/gin
