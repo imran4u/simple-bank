@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -82,5 +83,27 @@ func (s *Server) listAccount(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, accounts)
+
+}
+
+type deleteAccountRequest struct {
+	Id int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (s *Server) deleteAccount(ctx *gin.Context) {
+	var req deleteAccountRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	//
+	err := s.store.DeleteAccount(context.Background(), req.Id)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, fmt.Sprintf("Account deleted with id = %d", req.Id))
 
 }
