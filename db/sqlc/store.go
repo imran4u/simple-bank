@@ -7,21 +7,21 @@ import (
 )
 
 // to do all db operation and transaction( multiple operation with automicity)
-type store struct {
+type Store struct {
 	*Queries // composition to use as inharitance
-	db       *sql.DB
+	Db       *sql.DB
 }
 
-// create New store object
-func NewStore(db *sql.DB) *store {
-	return &store{
-		db:      db,
+// create New Store object
+func NewStore(db *sql.DB) *Store {
+	return &Store{
+		Db:      db,
 		Queries: New(db),
 	}
 }
 
-func (s *store) execTx(context context.Context, fn func(*Queries) error) error {
-	tx, err := s.db.BeginTx(context, nil)
+func (s *Store) execTx(context context.Context, fn func(*Queries) error) error {
+	tx, err := s.Db.BeginTx(context, nil)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ type TransferTxResult struct {
 
 // TransferTx performs a money transfer from one account to the other.
 // It creates the transfer, add account entries, and update accounts' balance within a database transaction
-func (store *store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {

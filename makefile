@@ -39,4 +39,8 @@ sqlc_gen:
 test:
 	go test -v -cover -count=1 ./...
 
-.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test postgres-start
+#start server
+run: 
+	go run main.go
+
+.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test postgres-start run
