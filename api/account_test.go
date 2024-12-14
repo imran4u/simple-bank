@@ -110,6 +110,22 @@ func TestGetAccountAppPossiblies(t *testing.T) {
 
 			},
 		},
+		{
+			name:      "Internal server error",
+			accountId: account.ID,
+			buildStub: func(store *mockdb.MockStore) {
+				//create stub
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				//Check response
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+
+			},
+		},
 	}
 
 	for i := range testCase {
