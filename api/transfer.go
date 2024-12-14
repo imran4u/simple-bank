@@ -14,7 +14,7 @@ type transferRequest struct {
 	ToAccountID   int64 `json:"to_account_id" binding:"required,min=1"`
 	Amount        int64 `json:"amount" binding:"required,gt=0"`
 	// Currency      string `json:"currency" binding:"required,currency"` // here currency is custom validator see the tag in server.go
-	Currency string `json:"currency" binding:"required,oneof=USD RS"`
+	Currency string `json:"currency" binding:"required,currency"`
 }
 
 func (server *Server) createTransfer(ctx *gin.Context) {
