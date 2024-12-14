@@ -59,25 +59,69 @@ func TestGetAccount(t *testing.T) {
 	require.NoError(t, err)
 
 	server.router.ServeHTTP(recorder, req)
+	//Check response
 	require.Equal(t, http.StatusOK, recorder.Code)
-	requiredBodyMachAccount(t, recorder.Body, accout)
+	requiredBodyMachAccount(t, recorder.Body, accout) // response body will install in recorder.Body field.
 
 }
 
 // Table drivern test set to cover all possible senario
 
-// func TestGetAccountAppPossiblies(t *testing.T){
-// 	account := randomAccount()
+func TestGetAccountAppPossiblies(t *testing.T) {
+	account := randomAccount()
 
-// 	//Ananomous struct
-// 	testCase := []struct{
-// 		name string,
-// 		accountId int64,
-// 		buildStub func(store *mockdb.MockStore),
-// 		// checkResponse func(t *testing.T, )
+	//Ananomous struct
+	testCase := []struct {
+		name          string
+		accountId     int64
+		buildStub     func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:      "Ok",
+			accountId: account.ID,
+			buildStub: func(store *mockdb.MockStore) {
+				//create stub
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(account, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				//Check response
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requiredBodyMachAccount(t, recorder.Body, account)
+			},
+		},
+		//TODO: add more test
 
-// 	}{
+	}
 
-// 	}
+	for i := range testCase {
+		tc := testCase[i]
 
-// }
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish() // this is important
+
+			store := mockdb.NewMockStore(ctrl)
+			//create stub
+			tc.buildStub(store)
+
+			//start test server and send request
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+
+			url := fmt.Sprintf("/account/%d", tc.accountId)
+			req, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, req)
+			//check Response
+			tc.checkResponse(t, recorder)
+
+		})
+
+	}
+
+}
