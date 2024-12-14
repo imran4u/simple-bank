@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -93,8 +94,22 @@ func TestGetAccountAppPossiblies(t *testing.T) {
 				requiredBodyMachAccount(t, recorder.Body, account)
 			},
 		},
-		//TODO: add more test
+		{
+			name:      "Not found",
+			accountId: account.ID,
+			buildStub: func(store *mockdb.MockStore) {
+				//create stub
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrNoRows)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				//Check response
+				require.Equal(t, http.StatusNotFound, recorder.Code)
 
+			},
+		},
 	}
 
 	for i := range testCase {
