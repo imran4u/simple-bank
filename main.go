@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal("can not connect to database")
 	}
-	store := db.Store{
+	store := db.SQLStore{
 		Queries: db.New(conn),
 		Db:      conn}
 	server := api.NewServer(&store)
