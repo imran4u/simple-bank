@@ -126,6 +126,21 @@ func TestGetAccountAppPossiblies(t *testing.T) {
 
 			},
 		},
+		{
+			name:      "Invalid request",
+			accountId: 0,
+			buildStub: func(store *mockdb.MockStore) {
+				//create stub
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				//Check response
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+
+			},
+		},
 	}
 
 	for i := range testCase {
