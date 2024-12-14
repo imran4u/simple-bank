@@ -43,4 +43,8 @@ test:
 run: 
 	go run main.go
 
+#Generate db mock, at last source folder and interface Name.
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/imran4u/simple-bank/db/sqlc Store
+
 .PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test postgres-start run

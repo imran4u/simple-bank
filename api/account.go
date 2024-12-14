@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -51,6 +52,10 @@ func (s *Server) getAccount(ctx *gin.Context) {
 	account, err := s.store.GetAccount(context.Background(), req.Id)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

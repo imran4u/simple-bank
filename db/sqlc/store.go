@@ -6,21 +6,27 @@ import (
 	"fmt"
 )
 
+// Store as interface to use in mocking
+type Store interface {
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+	Querier
+}
+
 // to do all db operation and transaction( multiple operation with automicity)
-type Store struct {
+type SQLStore struct {
 	*Queries // composition to use as inharitance
 	Db       *sql.DB
 }
 
 // create New Store object
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		Db:      db,
 		Queries: New(db),
 	}
 }
 
-func (s *Store) execTx(context context.Context, fn func(*Queries) error) error {
+func (s *SQLStore) execTx(context context.Context, fn func(*Queries) error) error {
 	tx, err := s.Db.BeginTx(context, nil)
 	if err != nil {
 		return err
@@ -58,7 +64,7 @@ type TransferTxResult struct {
 
 // TransferTx performs a money transfer from one account to the other.
 // It creates the transfer, add account entries, and update accounts' balance within a database transaction
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
