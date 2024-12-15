@@ -25,9 +25,13 @@ migrate_init :
 #to create tables in simple_bank database
 migrate_up:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
+migrate_up1:
+	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
 
 migrate_down:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down
+migrate_down1:
+	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
 
 # To generate sqlc go code from sqlc query ./db/query/ *.sql
 sqlc_gen:
@@ -47,4 +51,4 @@ run:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/imran4u/simple-bank/db/sqlc Store
 
-.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down sqlc_gen test postgres-start run
+.PHONY: createdb dropdb postgres migrate_init migrate_up migrate_down migrate_up1 migrate_down1 sqlc_gen test postgres-start run mock

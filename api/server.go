@@ -20,10 +20,11 @@ func NewServer(store db.Store) *Server {
 
 	//Register custom validator
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("currency", validCurrency)
+		v.RegisterValidation("currency", validCurrency) // now "currency tag will used for validating currency"
 	}
 
 	// Add handler
+	router.POST("/users", server.createUser)
 	router.POST("/account", server.createAccount)
 	router.GET("/account/:id", server.getAccount)
 	router.GET("/accounts", server.listAccount)

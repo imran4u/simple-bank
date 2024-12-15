@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -33,6 +34,11 @@ func RandomString(n int) string {
 	return builder.String()
 }
 
+// RandomOwner generates a random owner name
+func RandomOwner() string {
+	return RandomString(6)
+}
+
 func RandomName() string {
 	return RandomString(6)
 }
@@ -44,7 +50,12 @@ func RandomAmount() int64 {
 func RandomCurrency() string {
 	currencies := []string{
 		USD,
-		RS
+		RS,
 	}
 	return currencies[r.Intn(len(currencies))]
+}
+
+// RandomEmail generates a random email
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(6))
 }
