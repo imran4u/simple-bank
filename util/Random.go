@@ -34,6 +34,11 @@ func RandomString(n int) string {
 	return builder.String()
 }
 
+// RandomOwner generates a random owner name
+func RandomOwner() string {
+	return RandomString(6)
+}
+
 func RandomName() string {
 	return RandomString(6)
 }
