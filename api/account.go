@@ -1,114 +1,102 @@
 package api
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/imran4u/simple-bank/db/sqlc"
+	"github.com/imran4u/simple-bank/token"
 )
 
 type createAccountRequest struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,currency"`
 }
 
-func (s *Server) createAccount(ctx *gin.Context) {
+func (server *Server) createAccount(ctx *gin.Context) {
 	var req createAccountRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	//
-	account, err := s.store.CreateAccount(context.Background(), db.CreateAccountParams{
-		Owner:    req.Owner,
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	arg := db.CreateAccountParams{
+		Owner:    authPayload.Username,
 		Currency: req.Currency,
 		Balance:  0,
-	})
+	}
 
+	account, err := server.store.CreateAccount(ctx, arg)
 	if err != nil {
+		errCode := db.ErrorCode(err)
+		if errCode == db.ForeignKeyViolation || errCode == db.UniqueViolation {
+			ctx.JSON(http.StatusForbidden, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, account)
 
+	ctx.JSON(http.StatusOK, account)
 }
 
 type getAccountRequest struct {
-	Id int64 `uri:"id" binding:"required" min:"1"`
+	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
-func (s *Server) getAccount(ctx *gin.Context) {
+func (server *Server) getAccount(ctx *gin.Context) {
 	var req getAccountRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	//
-	account, err := s.store.GetAccount(context.Background(), req.Id)
-
+	account, err := server.store.GetAccount(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
+
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, account)
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if account.Owner != authPayload.Username {
+		err := errors.New("account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, account)
 }
 
 type listAccountRequest struct {
-	Page int32 `form:"page" binding:"required,min=1"`        // Corrected form tag to "page"
-	Size int32 `form:"size" binding:"required,min=5,max=10"` // No space after "min" and "max"
-
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
-func (s *Server) listAccount(ctx *gin.Context) {
+func (server *Server) listAccounts(ctx *gin.Context) {
 	var req listAccountRequest
-	if err := ctx.ShouldBind(&req); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.ListAccountsParams{
-		Owner:  "imran", // hardcode
-		Limit:  req.Size,
-		Offset: (req.Page - 1) * req.Size,
+		Owner:  authPayload.Username,
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
 	}
-	//
-	accounts, err := s.store.ListAccounts(context.Background(), arg)
 
+	accounts, err := server.store.ListAccounts(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
 	ctx.JSON(http.StatusOK, accounts)
-
-}
-
-type deleteAccountRequest struct {
-	Id int64 `uri:"id" binding:"required,min=1"`
-}
-
-func (s *Server) deleteAccount(ctx *gin.Context) {
-	var req deleteAccountRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
-	//
-	err := s.store.DeleteAccount(context.Background(), req.Id)
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-	ctx.JSON(http.StatusOK, fmt.Sprintf("Account deleted with id = %d", req.Id))
-
 }
