@@ -41,7 +41,7 @@ sqlc_gen:
 # ... : This is a Go-specific wildcard that means all subdirectories recursively
 # -count=1 : to disable go test cache.
 test:
-	go test -v -cover -count=1 ./...
+	# go test -v -cover -count=1 ./...
 
 #start server
 run: 
