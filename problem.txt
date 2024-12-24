@@ -1,0 +1,6 @@
+1. after sudo docker compose up api-service is failing to start, complaing wait-for.sh file.
+    a. try to run api service from docker file and 
+    b. do exec and check for wait-for.sh file
+
+2. After running server not able to connect from localhost:8080 from local machine but
+ curl is working inside running container, there is some issue where is the issue not able to fine. 
